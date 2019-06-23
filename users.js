@@ -4,6 +4,7 @@ var mysql = require('mysql');
 const jwt = require("jwt-simple");
 
 exports.login = function(req,res) {
+    console.log(req)
     let username = req.body.username;
     let password = req.body.password;
     var con = connectDB();
