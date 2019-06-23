@@ -3,10 +3,11 @@ var app = require('express')();
 var bodyParser = require('body-parser');
 require('dotenv').config();
 var mysql = require('mysql');
-
+const jwt=require('jsonwebtoken');
+const key='KEY';
 
 var waste = require('./waste');
-
+var users = require('./users');
 
 var port = process.env.PORT || 7777;
 //parse
@@ -15,6 +16,7 @@ app.use(bodyParser.urlencoded({
     extended: true,
     limit: '50mb'
 }));
+
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
@@ -46,11 +48,28 @@ app.get('/', function (req, res) {
     console.log('homestart ');
 });
 
+
+function verifyToken(req, res, next) {
+    var token = req.body.token;
+    if (!token)
+      return res.status(403).send({ auth: false, message: 'No token provided.' });
+      
+    jwt.verify(token, key, function(err, decoded) {
+      if (err)
+      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        
+      // if everything good, save to request for use in other routes
+      req.userId = decoded.id;
+      next();
+    });
+  }
+
 // --------------------------- Rout waste----------------------------
 app.post('/waste/createWaste',function(req,res){
 	waste.createWaste(req,res);
 });
-app.post('/waste/getWaste',function(req,res){
+app.post('/waste/getWaste',verifyToken, function(req, res, next){
+    // checkToken(req, res);
 	waste.getWaste(req,res);
 });
 
@@ -101,6 +120,11 @@ app.post('/news/deletenews',function(req,res){
 	waste.deletenews(req,res);
 });
 
+
+//------------------------ root users
+app.post('/users/login',function(req,res){
+	users.login(req,res);
+});
 
 
 app.listen(port, function () {

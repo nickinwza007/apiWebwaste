@@ -15,8 +15,8 @@ exports.createNews = function(req,res) {
     let users_id = req.body.users_id;
 
     var sql = `INSERT INTO news (news_id, title_news, contant, img_news, users_id) 
-    VALUES ('${payment_id}', '${users_id}', '${out_balance}', '${month_payments}', '${total_payments}')`;
-    con.query(sql,[news_id,title_news,contant,img_news,users_id],function(err,result){
+    VALUES ('${news_id}', '${title_news}', '${contant}', '${img_news}', '${users_id}')`;
+    con.query(sql,function(err,result){
       
         res.json({ status: true });
      
@@ -39,13 +39,14 @@ exports.createNews = function(req,res) {
     con.end();
  }
  exports.updateNews = function(req,res) {
-    let usersid = req.body.usersid;
+    let news_id= req.body.news_id;
+    let title_news = req.body.title_news;
+    let contant = req.body.contant;
+    let img_news = req.body.img_news;
+    let users_id = req.body.users_id;
 
-    var sql = `SELECT users_detail.*,users.*,users_picture.users_picture FROM users 
-    INNER JOIN users_detail ON users.users_detail_id=users_detail.id 
-    left join users_picture on users.id = users_picture.users_id
-    WHERE users.id = ?`;
-    con.query(sql,[usersid],function(err,result){
+    var sql = `UPDATE news SET users_id ='${users_id}', title_news = '${title_news}', contant = '${contant}',  img_news = '${img_news}'  WHERE (news_id = '${news_id}')`;
+    con.query(sql,function(err,result){
         if (result[0]!=null){
 
             res.json({ ok: true, status: list });
@@ -57,13 +58,11 @@ exports.createNews = function(req,res) {
     con.end();
  }
  exports.deleteNews = function(req,res) {
-    let usersid = req.body.usersid;
+    let news_id = req.body.news_id;
+    
 
-    var sql = `SELECT users_detail.*,users.*,users_picture.users_picture FROM users 
-    INNER JOIN users_detail ON users.users_detail_id=users_detail.id 
-    left join users_picture on users.id = users_picture.users_id
-    WHERE users.id = ?`;
-    con.query(sql,[usersid],function(err,result){
+    var sql = `DELETE FROM news WHERE (news_id = '${news_id}');`;
+    con.query(sql,function(err,result){
         if (result[0]!=null){
 
             res.json({ ok: true, status: list });
